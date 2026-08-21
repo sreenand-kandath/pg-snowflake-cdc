@@ -33,18 +33,9 @@ For each replicated table it maintains two things in Snowflake:
 - Resumable one-time backfill script + drift-detecting sync check for
   ongoing PostgreSQL ↔ Snowflake reconciliation
 
-```
-PostgreSQL (logical replication slot)
-        │  pgoutput binary protocol
-        ▼
-  pgoutput_parser.py   → decodes WAL messages into ChangeEvent objects
-        │
-        ▼
-  snowflake_sink.py    → buffers events, batches MERGE + INSERT per table
-        │
-        ▼
-      Snowflake  (CUSTOMERS + CUSTOMERS_HISTORY, ...)
-```
+<p align="center">
+  <img src="docs/architecture.svg" alt="Architecture: PostgreSQL WAL → pg-snowflake-cdc → Snowflake" width="900">
+</p>
 
 ## Why this exists
 
@@ -182,6 +173,14 @@ suite and a Docker build on every push; wire in your own deploy step
 Run only **one replica at a time** — a replication slot can only be consumed
 by one connection, so a second instance will just sit retrying rather than
 double-processing anything.
+
+## Contributing
+
+Issues and PRs are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md) for how
+to get set up. Found a security issue? See [SECURITY.md](SECURITY.md)
+instead of opening a public issue.
+
+See [CHANGELOG.md](CHANGELOG.md) for release history.
 
 ## License
 
