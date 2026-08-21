@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Local dev settings
+.env
+*.env
+local.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Runtime artefacts — never commit these
+*.log
+*_checkpoint.json
+checkpoint.json

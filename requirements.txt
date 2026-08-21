@@ -1,0 +1,8 @@
+azure-identity==1.19.0
+azure-keyvault-secrets==4.9.0
+cryptography==43.0.3
+psycopg2-binary>=2.9.9
+snowflake-connector-python
+opentelemetry-api>=1.24.0
+opentelemetry-sdk>=1.24.0
+opentelemetry-exporter-otlp-proto-http>=1.24.0
