@@ -1,14 +1,37 @@
 # pg-snowflake-cdc
 
-A lightweight change-data-capture (CDC) service that streams row-level
-changes from PostgreSQL to Snowflake in near real time, using PostgreSQL's
-built-in logical replication — no Debezium, no Kafka, no extra infrastructure.
+[![CI](https://github.com/sreenand-kandath/pg-snowflake-cdc/actions/workflows/ci.yml/badge.svg)](https://github.com/sreenand-kandath/pg-snowflake-cdc/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/)
+
+**PostgreSQL → Snowflake change data capture (CDC), without Kafka or Debezium.**
+
+A lightweight Python service that streams row-level changes from PostgreSQL
+to Snowflake in near real time using PostgreSQL's built-in **logical
+replication** (the `pgoutput` plugin) — just one small service, no message
+broker, no schema registry, no extra infrastructure to run.
 
 For each replicated table it maintains two things in Snowflake:
 
 - **A current-state table**, kept in sync via `MERGE` (upsert/delete)
 - **A `_HISTORY` table**, an append-only audit trail of every insert, update,
   and delete, with the PostgreSQL WAL LSN and commit timestamp attached
+
+### Features
+
+- Reads PostgreSQL WAL changes via a logical replication slot + publication
+  (`pgoutput`, built into Postgres 10+ — no extension to install)
+- Batched `MERGE` upserts and append-only history tables in Snowflake, with
+  automatic dedup of same-key changes within a batch
+- Handles partitioned source tables (`publish_via_partition_root`) and JSONB
+  columns (mapped to Snowflake `VARIANT` via `PARSE_JSON`)
+- Crash-safe: replays from the replication slot on restart, so writes are
+  never silently lost — retries with exponential back-off
+- Built-in liveness/readiness HTTP endpoints for container orchestrators
+- Structured JSON logging, OpenTelemetry tracing, and optional Datadog
+  metrics/log shipping (agentless, opt-in via env vars)
+- Resumable one-time backfill script + drift-detecting sync check for
+  ongoing PostgreSQL ↔ Snowflake reconciliation
 
 ```
 PostgreSQL (logical replication slot)
